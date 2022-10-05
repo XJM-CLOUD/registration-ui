@@ -172,7 +172,7 @@ export default {
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
+      if (!value || value.length < 6) {
         callback(new Error('密码长度不能小于6位'))
       } else {
         callback()
@@ -211,12 +211,12 @@ export default {
         create: '新增'
       },
       rules: {
-        userName: [{ required: true, message: '用户名不能为空', trigger: 'change', validator: validateUsername }],
-        userPwd: [{ required: true, message: '密码不能为空', trigger: 'change', validator: validatePassword }],
+        userName: [{ required: true, trigger: 'change', validator: validateUsername }],
+        userPwd: [{ required: true, trigger: 'change', validator: validatePassword }],
         realName: [{ required: true, message: '真实姓名不能为空', trigger: 'change' }],
         phone: [{ required: true, message: '手机号不能为空', trigger: 'change' }],
         roles: [{ required: true, message: '角色不能为空', trigger: 'change' }],
-        enableStatus: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        enableStatus: [{ required: true, message: '状态不能为空', trigger: 'blur' }]
       },
       downloadLoading: false
     }
