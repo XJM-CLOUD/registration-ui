@@ -15,11 +15,11 @@ service.interceptors.request.use(
   config => {
     // do something before request is sent
 
-    if (store.getters.token) {
+    if (store.getters.token && config.url !== '/token/refreshToken') {
       // let each request carry token
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
-      config.headers['X-Token'] = getToken()
+      config.headers['Authorization'] = `Bearer ${getToken()}`
     }
     return config
   },
@@ -47,6 +47,13 @@ service.interceptors.response.use(
 
     // if the custom code is not 200, it is judged as an error.
     if (res.code !== 200) {
+      if (res.code === 209) {
+        // 刷新token
+        store.dispatch('user/refreshToken').then(() => {
+          location.reload()
+        })
+        return
+      }
       Message({
         message: res.message || 'Error',
         type: 'error',
@@ -54,7 +61,7 @@ service.interceptors.response.use(
       })
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.code === 204 || res.code === 50008 || res.code === 50012 || res.code === 50014) {
+      if (res.code === 210 || res.code === 50008 || res.code === 50012 || res.code === 50014) {
         // to re-login
         MessageBox.confirm('您已注销，您可以取消以停留在此页面，或重新登录', '确认注销', {
           confirmButtonText: '重新登录',

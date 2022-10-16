@@ -8,11 +8,18 @@ export function login(data) {
   })
 }
 
+export function refreshToken(refreshToken) {
+  return request({
+    url: '/token/refreshToken',
+    method: 'post',
+    params: { refreshToken }
+  })
+}
+
 export function getInfo(token) {
   return request({
     url: '/user/getInfo',
-    method: 'get',
-    params: { token }
+    method: 'get'
   })
 }
 

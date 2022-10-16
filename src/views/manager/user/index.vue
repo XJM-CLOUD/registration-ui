@@ -27,11 +27,6 @@
           <span>{{ row.userId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" width="150px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.createTime }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="用户名" min-width="150px">
         <template slot-scope="{row}">
           <span class="link-type" @click="handleUpdate(row)">{{ row.userName }}</span>
@@ -57,6 +52,11 @@
           <el-tag :type="row.enableStatus | statusFilter">
             {{ row.enableStatus | statusNameFilter }}
           </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" width="170px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.createTime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">

@@ -1,10 +1,11 @@
-import { login, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { login, logout, getInfo, refreshToken } from '@/api/user'
+import { getToken, setToken, removeToken, getRefreshToken, setRefreshToken, removeRefreshToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
 const getDefaultState = () => {
   return {
     token: getToken(),
+    refresh_token: getRefreshToken(),
     name: '',
     avatar: '',
     introduction: '',
@@ -20,6 +21,9 @@ const mutations = {
   },
   SET_TOKEN: (state, token) => {
     state.token = token
+  },
+  SET_REFRESH_TOKEN: (state, refresh_token) => {
+    state.refresh_token = refresh_token
   },
   SET_INTRODUCTION: (state, introduction) => {
     state.introduction = introduction
@@ -42,8 +46,26 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        commit('SET_TOKEN', data.access_token)
+        commit('SET_REFRESH_TOKEN', data.refresh_token)
+        setToken(data.access_token)
+        setRefreshToken(data.refresh_token)
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // refresh token
+  refreshToken({ commit }) {
+    return new Promise((resolve, reject) => {
+      refreshToken(getRefreshToken()).then(response => {
+        const { data } = response
+        commit('SET_TOKEN', data.access_token)
+        commit('SET_REFRESH_TOKEN', data.refresh_token)
+        setToken(data.access_token)
+        setRefreshToken(data.refresh_token)
         resolve()
       }).catch(error => {
         reject(error)
@@ -84,8 +106,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
         commit('SET_TOKEN', '')
+        commit('SET_REFRESH_TOKEN', '')
         commit('SET_ROLES', [])
         removeToken()
+        removeRefreshToken()
         resetRouter()
 
         // reset visited views and cached views
@@ -103,8 +127,10 @@ const actions = {
   resetToken({ commit }) {
     return new Promise(resolve => {
       commit('SET_TOKEN', '')
+      commit('SET_REFRESH_TOKEN', '')
       commit('SET_ROLES', [])
       removeToken()
+      removeRefreshToken()
       resolve()
     })
   },
